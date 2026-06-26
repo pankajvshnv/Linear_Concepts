@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linear Concepts — Architecture & Interior Design</title>
+  <meta name="description" content="Linear Concepts is an award-winning Architecture, Interior and Urban Design firm. Over 350 projects pan-India since 1988, spanning High Rise Housing, Retail, Corporate Interiors and more.">
+  <meta name="keywords" content="architecture, interior design, urban planning, India, Gurugram, Delhi, Linear Concepts">
+  <meta property="og:title" content="Linear Concepts — Architecture & Interior Design">
+  <meta property="og:description" content="From Sky to Sanctuary. Over 350 projects pan-India since 1988.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+
+  <!-- ================= LOADING OVERLAY ================= -->
+  <div id="loading-overlay" role="status" aria-live="polite">
+    <div class="loading-brand">Linear Concepts</div>
+    <div class="loading-text"><span id="loading-percent">0</span>%</div>
+    <div class="loading-sub">Loading Experience</div>
+    <div class="loading-bar-wrap">
+      <div class="loading-bar-fill" id="loading-bar-fill"></div>
+    </div>
+    <button id="loading-skip" style="margin-top:24px;background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.45);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;padding:8px 20px;border-radius:999px;cursor:pointer;font-family:inherit;transition:all 0.2s ease;" onmouseover="this.style.color='rgba(255,255,255,0.8)';this.style.borderColor='rgba(255,255,255,0.3)'" onmouseout="this.style.color='rgba(255,255,255,0.45)';this.style.borderColor='rgba(255,255,255,0.15)'">Skip →</button>
+  </div>
+
+  <!-- Hidden video source (frame extraction only) -->
+  <video id="source-video" src="assets/hero.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
+
+  <!-- ================= NAV ================= -->
+  <header class="site-header" id="site-header" role="banner">
+    <a href="https://www.linearconcepts.in/" class="logo" aria-label="Linear Concepts – Home">
+      <div class="logo-mark" aria-hidden="true">L</div>
+      <div class="logo-text">LINEAR<span>CONCEPTS</span></div>
+    </a>
+
+    <nav class="main-nav" id="main-nav" role="navigation" aria-label="Primary navigation">
+      <a href="https://www.linearconcepts.in/" id="nav-home">Home</a>
+      <a href="https://www.linearconcepts.in/about-us.html" id="nav-about">About</a>
+      <a href="https://www.linearconcepts.in/projects.html" id="nav-projects">Projects</a>
+      <a href="https://www.linearconcepts.in/services.html" id="nav-services">Services</a>
+    </nav>
+
+    <a href="https://www.linearconcepts.in/contact-us.html" class="btn-nav" id="nav-cta">
+      Contact Us <span class="arrow">↗</span>
+    </a>
+
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle mobile menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- ================= HERO — scroll-scrubbed frame sequence ================= -->
+  <div class="scroll-spacer" id="spacer">
+    <div class="video-pinned" role="img" aria-label="Aerial to interior architectural sequence">
+      <img id="hero-frame" alt="Linear Concepts architectural photography">
+      <div class="hero-overlay">
+        <div class="hero-eyebrow">
+          <span class="hero-eyebrow-dot" aria-hidden="true"></span>
+          Architecture &amp; Interior Design
+        </div>
+        <h1>From Sky<br>to Sanctuary</h1>
+        <div class="hero-badge">
+          <div class="scroll-hint" id="scroll-hint">
+            <div class="scroll-hint-icon" aria-hidden="true">↓</div>
+            Scroll to explore
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= STATS BAR ================= -->
+  <section class="stats-section" aria-label="Key statistics">
+    <div class="stats-bar">
+      <div class="stat" data-reveal data-stagger="0">
+        <div class="stat-value">
+          <span class="stat-num" data-count="4800">0</span>
+          <span class="stat-suffix">+</span>
+        </div>
+        <span class="stat-label">Acres<br>Master Planning</span>
+      </div>
+      <div class="stat" data-reveal data-stagger="1">
+        <div class="stat-value">
+          <span class="stat-num" data-count="12">0</span>
+          <span class="stat-suffix">M</span>
+        </div>
+        <span class="stat-label">Sq. Ft.<br>Retail &amp; Mixed Use</span>
+      </div>
+      <div class="stat" data-reveal data-stagger="2">
+        <div class="stat-value">
+          <span class="stat-num" data-count="9">0</span>
+          <span class="stat-suffix">M</span>
+        </div>
+        <span class="stat-label">Sq. Ft.<br>Offices &amp; IT Parks</span>
+      </div>
+      <div class="stat" data-reveal data-stagger="3">
+        <div class="stat-value">
+          <span class="stat-num" data-count="350">0</span>
+          <span class="stat-suffix">+</span>
+        </div>
+        <span class="stat-label">Projects<br>Pan-India</span>
+      </div>
+      <div class="stat" data-reveal data-stagger="4">
+        <div class="stat-value">
+          <span class="stat-num" data-count="35">0</span>
+          <span class="stat-suffix">+</span>
+        </div>
+        <span class="stat-label">Years<br>of Excellence</span>
+      </div>
+      <div class="stat" data-reveal data-stagger="5">
+        <div class="stat-value">
+          <span class="stat-num" data-count="12">0</span>
+          <span class="stat-suffix"></span>
+        </div>
+        <span class="stat-label">Cities<br>Served</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section class="about-section" id="about" aria-labelledby="about-heading">
+    <!-- ambient glow -->
+    <div class="glow-blob glow-blob-purple" style="width:600px;height:600px;top:-100px;left:-200px;" aria-hidden="true"></div>
+
+    <div class="about-left" data-reveal>
+      <span class="section-label">About Us</span>
+      <h2 id="about-heading">Design that<br><span class="text-gradient">challenges</span><br>convention.</h2>
+      <p>Linear Concepts is an Architectural, Interior and Urban-Designing firm with a reputation for challenging convention and pursuing design excellence. We work in an intimate, responsive environment that collectively values good design, simplicity and positive relationships.</p>
+      <p>We've worked on over 350 projects pan-India since 1988 — spanning High Rise Housing, Retail, Corporate Interiors, Housing Development, High-End Villas, Hotels and Resorts.</p>
+      <a href="https://www.linearconcepts.in/about-us.html" class="link-arrow" id="about-read-more">Read Our Story <span class="arrow">→</span></a>
+    </div>
+
+    <div class="about-right">
+      <div class="about-img-wide" data-reveal data-stagger="1">
+        <div class="img-placeholder">Wide Exterior View</div>
+        <span class="img-placeholder-label">Architecture</span>
+      </div>
+      <div class="about-img-row">
+        <div class="about-img-sm" data-reveal data-stagger="2">
+          <div class="img-placeholder">Interior 01</div>
+          <span class="img-placeholder-label">Interior</span>
+        </div>
+        <div class="about-img-sm" data-reveal data-stagger="3">
+          <div class="img-placeholder">Interior 02</div>
+          <span class="img-placeholder-label">Detail</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PROJECTS ================= -->
+  <section class="projects-section" id="projects" aria-labelledby="projects-heading">
+    <div class="section-header">
+      <div>
+        <span class="section-label" data-reveal>Selected Work</span>
+        <h2 id="projects-heading" data-reveal data-stagger="1">Spaces That Inspire.<br>Projects That Last.</h2>
+      </div>
+      <div class="section-header-right" data-reveal data-stagger="2">
+        <p>Discover our range of interior designs that turn ideas into stunning spaces.</p>
+        <a href="https://www.linearconcepts.in/projects.html" class="link-arrow" id="projects-view-all">View All Projects <span class="arrow">↗</span></a>
+      </div>
+    </div>
+
+    <div class="projects-grid">
+      <article class="project-card" data-reveal data-stagger="0">
+        <div class="project-card-img">
+          <div class="img-placeholder">Micasa — Residential</div>
+        </div>
+        <div class="project-card-body">
+          <div class="project-card-title">
+            Micasa — Linear Concepts
+            <span class="ext-icon" aria-hidden="true">↗</span>
+          </div>
+          <div class="tags">
+            <span class="tag">Scandinavian</span>
+            <span class="tag">Functional Elegance</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-reveal data-stagger="1">
+        <div class="project-card-img">
+          <div class="img-placeholder">Facades — Architecture</div>
+        </div>
+        <div class="project-card-body">
+          <div class="project-card-title">
+            Facades — Linear Concepts
+            <span class="ext-icon" aria-hidden="true">↗</span>
+          </div>
+          <div class="tags">
+            <span class="tag">Timber Architecture</span>
+            <span class="tag">Nature Immersion</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-reveal data-stagger="2">
+        <div class="project-card-img">
+          <div class="img-placeholder">Satyasheel — Corporate</div>
+        </div>
+        <div class="project-card-body">
+          <div class="project-card-title">
+            Satyasheel
+            <span class="ext-icon" aria-hidden="true">↗</span>
+          </div>
+          <div class="tags">
+            <span class="tag">Gurugram</span>
+            <span class="tag">Industrial Chic</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= SERVICES ================= -->
+  <section class="services-section" id="services" aria-labelledby="services-heading">
+    <div class="services-bg" data-reveal>
+      <div class="services-bg-inner" role="img" aria-label="Interior design background"></div>
+    </div>
+    <div class="services-card" data-reveal data-stagger="1" role="region" aria-labelledby="services-heading">
+      <span class="services-card-eyebrow">Our Services</span>
+      <h3 id="services-heading">Interior Design</h3>
+      <div class="services-card-img">
+        <div class="img-placeholder">Service Preview</div>
+      </div>
+      <p>A full-service approach to designing interiors that are cohesive, functional, and tailored to the way each space is used.</p>
+      <div class="services-counter">
+        <div class="services-dots" aria-hidden="true">
+          <div class="services-dot active"></div>
+          <div class="services-dot"></div>
+          <div class="services-dot"></div>
+          <div class="services-dot"></div>
+          <div class="services-dot"></div>
+        </div>
+        01 / 05
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GALLERY ================= -->
+  <section class="gallery-section" id="gallery" aria-labelledby="gallery-heading">
+    <div class="section-header">
+      <div>
+        <span class="section-label" data-reveal>Instagram</span>
+        <h2 id="gallery-heading" data-reveal data-stagger="1">Creative Moments<br>Shared With the World.</h2>
+      </div>
+      <div class="section-header-right" data-reveal data-stagger="2">
+        <p>Discover our process, projects and creativity on your favorite platforms.</p>
+        <a href="#" class="link-arrow" id="gallery-follow">Follow on Instagram <span class="arrow">↗</span></a>
+      </div>
+    </div>
+
+    <div class="gallery-grid">
+      <div class="gallery-item" data-reveal data-stagger="0">
+        <div class="img-placeholder">01</div>
+        <div class="gallery-item-overlay"><span>View on Instagram</span></div>
+      </div>
+      <div class="gallery-item" data-reveal data-stagger="1">
+        <div class="img-placeholder">02</div>
+        <div class="gallery-item-overlay"><span>View on Instagram</span></div>
+      </div>
+      <div class="gallery-item" data-reveal data-stagger="2">
+        <div class="img-placeholder">03</div>
+        <div class="gallery-item-overlay"><span>View on Instagram</span></div>
+      </div>
+      <div class="gallery-item" data-reveal data-stagger="3">
+        <div class="img-placeholder">04</div>
+        <div class="gallery-item-overlay"><span>View on Instagram</span></div>
+      </div>
+      <div class="gallery-item" data-reveal data-stagger="4">
+        <div class="img-placeholder">05</div>
+        <div class="gallery-item-overlay"><span>View on Instagram</span></div>
+      </div>
+      <div class="gallery-item" data-reveal data-stagger="5">
+        <div class="img-placeholder">06</div>
+        <div class="gallery-item-overlay"><span>View on Instagram</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CONTACT + FOOTER ================= -->
+  <section class="contact-section" id="contact" aria-labelledby="contact-heading">
+    <div class="contact-inner">
+      <div class="contact-grid">
+
+        <!-- Left: headline card -->
+        <div class="contact-left" data-reveal>
+          <div>
+            <span class="section-label">Get In Touch</span>
+            <h2 id="contact-heading">Let's build<br>extraordinary<br>together.</h2>
+          </div>
+          <div class="contact-left-sketch">
+            Sketch / Render Preview
+          </div>
+        </div>
+
+        <!-- Studio: Gurugram -->
+        <div class="studio-card" data-reveal data-stagger="1">
+          <div class="studio-img">
+            <div class="img-placeholder">Gurugram Studio</div>
+          </div>
+          <h4>Gurugram Studio</h4>
+          <p>Office No. 204, Bestech Chambers,<br>Sushant Lok-1, B Block,<br>Gurugram, Haryana — 122002</p>
+          <p>+91 98112 05110<br>studio@linearconcepts.in</p>
+          <a href="#" class="link-arrow" id="map-gurugram">View on Map <span class="arrow">→</span></a>
+        </div>
+
+        <!-- Studio: Delhi -->
+        <div class="studio-card" data-reveal data-stagger="2">
+          <div class="studio-img">
+            <div class="img-placeholder">Delhi Studio</div>
+          </div>
+          <h4>Delhi Studio</h4>
+          <p>407 A09, GD ITL North-Ex Towers,<br>Netaji Subhash Place,<br>New Delhi — 110034</p>
+          <p>+91 98112 05110<br>studio@linearconcepts.in</p>
+          <a href="#" class="link-arrow" id="map-delhi">View on Map <span class="arrow">→</span></a>
+        </div>
+
+        <!-- Contact form -->
+        <form class="contact-form" data-reveal data-stagger="3" aria-label="Send a message">
+          <span class="form-label">Send A Message</span>
+          <div class="form-row">
+            <input type="text" id="form-name" placeholder="Your Name" autocomplete="name" required>
+            <input type="email" id="form-email" placeholder="Email Address" autocomplete="email" required>
+          </div>
+          <select id="form-project" aria-label="Project type" required>
+            <option value="" disabled selected>Project Type</option>
+            <option value="architecture">Architecture</option>
+            <option value="interior">Interior Design</option>
+            <option value="master-planning">Master Planning</option>
+            <option value="urban-design">Urban Design</option>
+          </select>
+          <textarea id="form-message" placeholder="Tell us about your project…" aria-label="Your message" required></textarea>
+          <button type="submit" class="btn-submit" id="form-submit">
+            Send Message <span class="arrow">→</span>
+          </button>
+        </form>
+
+      </div><!-- /contact-grid -->
+
+      <!-- Footer bottom bar -->
+      <div class="footer-bottom">
+        <div class="footer-logo">LINEAR<span>CONCEPTS</span></div>
+        <p class="footer-copy">© 2026 Linear Concepts. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="#" id="footer-instagram">Instagram</a>
+          <a href="#" id="footer-linkedin">LinkedIn</a>
+          <a href="#" id="footer-behance">Behance</a>
+        </div>
+        <div class="footer-links">
+          <a href="https://www.linearconcepts.in/" id="footer-home">Home</a>
+          <a href="https://www.linearconcepts.in/about-us.html" id="footer-about">About</a>
+          <a href="https://www.linearconcepts.in/projects.html" id="footer-projects">Projects</a>
+          <a href="https://www.linearconcepts.in/services.html" id="footer-services">Services</a>
+          <a href="https://www.linearconcepts.in/our-team.html" id="footer-team">Team</a>
+        </div>
+        <button class="back-to-top" id="back-to-top" aria-label="Back to top">↑</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
