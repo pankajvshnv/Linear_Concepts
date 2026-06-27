@@ -346,3 +346,50 @@ if (scrollHint) {
     }
   }, { passive: true });
 }
+
+/* ============================================================
+   PROJECT CARD CAROUSELS
+   ============================================================ */
+function initCarousels() {
+  const carousels = document.querySelectorAll('[data-carousel]');
+
+  carousels.forEach((carousel) => {
+    const id      = carousel.dataset.carousel;
+    const slides  = Array.from(carousel.querySelectorAll('.card-slide'));
+    const card    = carousel.closest('.project-card-img');
+    const countEl = card?.querySelector('.card-count');
+    const total   = slides.length;
+    let current   = 0;
+
+    function goTo(n) {
+      slides[current].classList.remove('active');
+      current = (n + total) % total;
+      slides[current].classList.add('active');
+      if (countEl) countEl.textContent = `${current + 1} / ${total}`;
+    }
+
+    // Prev / Next buttons
+    const prevBtn = card?.querySelector('.carousel-prev[data-target="' + id + '"]');
+    const nextBtn = card?.querySelector('.carousel-next[data-target="' + id + '"]');
+
+    if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); goTo(current - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); goTo(current + 1); });
+
+    // Keyboard: when card is focused
+    card?.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(current - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
+    });
+
+    // Touch swipe
+    let touchStartX = 0;
+    carousel.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    carousel.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 40) goTo(current + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+  });
+}
+
+initCarousels();
+
