@@ -24,6 +24,7 @@ const overlay      = document.getElementById('loading-overlay');
 const percentLabel = document.getElementById('loading-percent');
 const barFill      = document.getElementById('loading-bar-fill');
 const header       = document.getElementById('site-header');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Allow cross-origin video (required for canvas.toBlob)
 video.crossOrigin = 'anonymous';
@@ -31,6 +32,7 @@ video.crossOrigin = 'anonymous';
 let blobUrls    = [];
 let scrollReady = false;
 let earlyInit   = false;
+let motionTicking = false;
 
 /* ============================================================
    LOADING PROGRESS
@@ -98,6 +100,7 @@ function getScrollProgress() {
 function updateFrame() {
   if (!scrollReady) return;
   const p = getScrollProgress();
+  document.documentElement.style.setProperty('--hero-progress', p.toFixed(3));
   const idx = Math.round(p * (blobUrls.length - 1));
   if (heroImg.src !== blobUrls[idx]) heroImg.src = blobUrls[idx];
 }
@@ -110,9 +113,10 @@ function init() {
   window.addEventListener('resize', updateFrame);
   updateFrame();
   overlay.classList.add('hidden');
+  document.body.classList.add('page-ready');
 }
 
-video.addEventListener('loadedmetadata', async () => {
+async function handleVideoReady() {
   console.log('[LC] Video ready. Duration:', video.duration);
   try {
     await extractAllFrames();
@@ -127,7 +131,13 @@ video.addEventListener('loadedmetadata', async () => {
         ? 'Canvas tainted — check CORS on video.' 
         : 'Serve over http(s) — not file://. Then reload.';
   }
-});
+}
+
+video.addEventListener('loadedmetadata', handleVideoReady, { once: true });
+
+if (video.readyState >= 1) {
+  handleVideoReady();
+}
 
 video.addEventListener('error', () => {
   console.error('[LC] Video failed to load.');
@@ -146,6 +156,7 @@ setTimeout(() => {
 setTimeout(() => {
   if (!overlay.classList.contains('hidden')) {
     overlay.classList.add('hidden');
+    document.body.classList.add('page-ready');
     console.warn('[LC] Loading overlay force-dismissed after 15s');
   }
 }, 15000);
@@ -155,8 +166,62 @@ const skipBtn = document.getElementById('loading-skip');
 if (skipBtn) {
   skipBtn.addEventListener('click', () => {
     overlay.classList.add('hidden');
+    document.body.classList.add('page-ready');
     if (!scrollReady && blobUrls.length > 0) init();
   });
+}
+
+/* ============================================================
+   SITE-WIDE MOTION — Framer-style choreography without a framework
+   ============================================================ */
+function setupMotionAttributes() {
+  document.querySelectorAll('.about-left, .contact-left').forEach((el) => {
+    el.setAttribute('data-reveal', 'left');
+  });
+
+  document.querySelectorAll('.about-img-wide, .about-img-sm, .services-bg, .marquee-row').forEach((el) => {
+    if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', 'zoom');
+  });
+
+  document.querySelectorAll('.section-header-right, .services-card, .studio-card, .contact-form').forEach((el) => {
+    if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal', 'right');
+  });
+
+  document.querySelectorAll('.marquee-row').forEach((el, index) => {
+    el.dataset.stagger = String(index + 1);
+  });
+
+  document.querySelectorAll('.glow-blob, .services-bg-img').forEach((el, index) => {
+    el.dataset.parallax = String(index % 2 === 0 ? -0.08 : 0.08);
+  });
+}
+
+function updateScrollMotion() {
+  motionTicking = false;
+  const viewportH = window.innerHeight || 1;
+
+  document.querySelectorAll('[data-parallax]').forEach((el) => {
+    const speed = parseFloat(el.dataset.parallax || '0');
+    const rect = el.getBoundingClientRect();
+    const centerDelta = (rect.top + rect.height / 2) - viewportH / 2;
+    const y = centerDelta * speed;
+    el.style.setProperty('--parallax-y', `${y.toFixed(2)}px`);
+    el.style.transform = `translate3d(0, var(--parallax-y), 0)`;
+  });
+}
+
+function requestScrollMotion() {
+  if (motionTicking || prefersReducedMotion) return;
+  motionTicking = true;
+  requestAnimationFrame(updateScrollMotion);
+}
+
+setupMotionAttributes();
+
+if (!prefersReducedMotion) {
+  window.addEventListener('scroll', requestScrollMotion, { passive: true });
+  window.addEventListener('resize', requestScrollMotion);
+  requestScrollMotion();
 }
 
 /* ============================================================
@@ -181,9 +246,17 @@ revealEls.forEach((el) => revealObserver.observe(el));
 const statEls = document.querySelectorAll('[data-count]');
 
 function animateCount(el) {
+  if (el.dataset.countAnimated === 'true') return;
+  el.dataset.countAnimated = 'true';
+
   const target   = parseInt(el.dataset.count, 10);
   const duration = 1600;
   const start    = performance.now();
+
+  if (prefersReducedMotion) {
+    el.textContent = target.toLocaleString();
+    return;
+  }
 
   function tick(now) {
     const progress = Math.min((now - start) / duration, 1);
@@ -197,13 +270,16 @@ function animateCount(el) {
 const statObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => {
     if (entry.isIntersecting) {
-      animateCount(entry.target);
+      const counter = entry.target.matches('[data-count]')
+        ? entry.target
+        : entry.target.querySelector('[data-count]');
+      if (counter) animateCount(counter);
       statObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.4 });
+}, { threshold: 0.2, rootMargin: '0px 0px -10% 0px' });
 
-statEls.forEach((el) => statObserver.observe(el));
+statEls.forEach((el) => statObserver.observe(el.closest('.stat') || el));
 
 /* ============================================================
    FROSTED-GLASS NAV ON SCROLL
@@ -393,3 +469,99 @@ function initCarousels() {
 
 initCarousels();
 
+/* ============================================================
+   TEXT REVEAL ANIMATION (About Section)
+   ============================================================ */
+const scrollRevealSection = document.querySelector('.scroll-reveal-section');
+const revealText = document.getElementById('reveal-text');
+if (scrollRevealSection && revealText) {
+  const childNodes = Array.from(revealText.childNodes);
+  revealText.innerHTML = '';
+  
+  childNodes.forEach(node => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const words = node.textContent.split(/\s+/).filter(w => w.trim() !== '');
+      words.forEach(word => {
+        const span = document.createElement('span');
+        span.textContent = word + ' ';
+        span.classList.add('reveal-word');
+        revealText.appendChild(span);
+      });
+    } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'BR') {
+      revealText.appendChild(document.createElement('br'));
+    }
+  });
+
+  const wordSpans = revealText.querySelectorAll('.reveal-word');
+
+  window.addEventListener('scroll', () => {
+    const rect = revealText.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    
+    // Start revealing when the top of the text enters 85% from top of window
+    // Finish revealing when the top of the text reaches 35% from top of window
+    const startOffset = windowHeight * 0.85;
+    const endOffset = windowHeight * 0.35;
+    
+    let progress = (startOffset - rect.top) / (startOffset - endOffset);
+    if (progress < 0) progress = 0;
+    if (progress > 1) progress = 1;
+
+    wordSpans.forEach((span, index) => {
+      const start = index / wordSpans.length;
+      const end = (index + 1) / wordSpans.length;
+      
+      let wordProgress = (progress - start) / (end - start);
+      if (wordProgress < 0) wordProgress = 0;
+      if (wordProgress > 1) wordProgress = 1;
+      
+      const alpha = 0.15 + (0.85 * wordProgress);
+      span.style.color = `rgba(23, 21, 18, ${alpha})`;
+    });
+  }, { passive: true });
+}
+
+/* ============================================================
+   STAT COUNTER ANIMATION
+   ============================================================ */
+const statNumbers = document.querySelectorAll('.stat-num');
+if (statNumbers.length > 0) {
+  const statObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const target = entry.target;
+        const countTo = parseInt(target.getAttribute('data-count'), 10);
+        const duration = 2500; // 2.5 seconds for smoother, longer count
+
+        // Wait a tiny bit for the reveal animation to start making it visible
+        setTimeout(() => {
+          const startTime = performance.now();
+
+          const updateCounter = (currentTime) => {
+            const elapsedTime = currentTime - startTime;
+            const progress = Math.min(elapsedTime / duration, 1);
+            
+            // Easing function (easeOutQuart) for a smooth finish
+            const easeOut = 1 - Math.pow(1 - progress, 4);
+            const currentCount = Math.floor(easeOut * countTo);
+            
+            target.textContent = currentCount;
+
+            if (progress < 1) {
+              requestAnimationFrame(updateCounter);
+            } else {
+              target.textContent = countTo;
+            }
+          };
+          requestAnimationFrame(updateCounter);
+        }, 200); // 200ms delay
+
+        observer.unobserve(target); // Only animate once
+      }
+    });
+  }, { threshold: 0.8 }); // Only trigger when 80% visible
+
+  statNumbers.forEach(stat => {
+    statObserver.observe(stat);
+  });
+}
