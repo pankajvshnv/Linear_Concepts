@@ -1695,12 +1695,14 @@ body::before {
   .contact-section { padding: 80px 24px 0; }
   .contact-grid { grid-template-columns: 1fr; }
   .hero-overlay { padding: 0 28px 48px; }
+  .hero-overlay h1 { font-size: 64px; }
   .stats-bar { grid-template-columns: repeat(2, 1fr); }
   .footer-bottom { flex-direction: column; align-items: flex-start; }
   .site-header { width: calc(100% - 24px); padding: 10px 14px 10px 12px; }
 }
 
 @media (max-width: 480px) {
+  .hero-overlay h1 { font-size: 48px; }
   .gallery-grid { grid-template-columns: repeat(2, 1fr); }
   .form-row { grid-template-columns: 1fr; }
   .stats-bar { grid-template-columns: 1fr 1fr; }
