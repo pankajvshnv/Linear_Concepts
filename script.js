@@ -8,6 +8,20 @@
    – Mobile nav toggle
    – Smooth anchor scroll
    ==================================================== */
+// ---- SMOOTH SCROLL (LENIS + GSAP) ----
+const lenis = new Lenis({
+  lerp: 0.08,
+  wheelMultiplier: 1,
+  smoothWheel: true,
+  touchMultiplier: 2,
+});
+
+lenis.on('scroll', ScrollTrigger.update);
+
+gsap.ticker.add((time) => {
+  lenis.raf(time * 1000);
+});
+gsap.ticker.lagSmoothing(0);
 
 // ---- CONFIG ----
 const FRAME_COUNT   = 60;       // 60 = good balance of smooth + fast
@@ -125,7 +139,7 @@ function updateFrames() {
     const idx = Math.round(p * (blobUrlsProcess.length - 1));
     if (processImg.src !== blobUrlsProcess[idx]) processImg.src = blobUrlsProcess[idx];
     // Zoom effect: scale from 1.0 to 1.25 as user scrolls
-    processImg.style.transform = `scale(${1 + (p * 0.25)})`;
+    processImg.style.transform = 'scale(1)';
   }
 }
 
