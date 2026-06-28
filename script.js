@@ -17,9 +17,15 @@ const WEBP_QUALITY  = 0.80;
 const SHOW_AFTER    = 1;        // show page after extracting this many frames
 
 // ---- ELEMENTS ----
-const video        = document.getElementById('source-video');
+const videoHero    = document.getElementById('source-video');
+const videoProcess = document.getElementById('process-video');
+
 const heroImg      = document.getElementById('hero-frame');
-const spacer       = document.getElementById('spacer');
+const spacerHero   = document.getElementById('spacer');
+
+const processImg   = document.getElementById('process-frame');
+const spacerProcess= document.getElementById('process-spacer');
+
 const overlay      = document.getElementById('loading-overlay');
 const percentLabel = document.getElementById('loading-percent');
 const barFill      = document.getElementById('loading-bar-fill');
@@ -27,11 +33,16 @@ const header       = document.getElementById('site-header');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Allow cross-origin video (required for canvas.toBlob)
-video.crossOrigin = 'anonymous';
+if(videoHero) videoHero.crossOrigin = 'anonymous';
+if(videoProcess) videoProcess.crossOrigin = 'anonymous';
 
-let blobUrls    = [];
-let scrollReady = false;
-let earlyInit   = false;
+let blobUrlsHero    = [];
+let blobUrlsProcess = [];
+
+let scrollReadyHero    = false;
+let scrollReadyProcess = false;
+
+let earlyInitHero   = false;
 let motionTicking = false;
 
 /* ============================================================
@@ -53,12 +64,13 @@ function captureFrame(canvas) {
   });
 }
 
-async function extractAllFrames() {
+async function extractVideoFrames(vidElement, urlsArray, onProgress, onFirstFrame) {
   const canvas = document.createElement('canvas');
   canvas.width  = OUTPUT_WIDTH;
   canvas.height = OUTPUT_HEIGHT;
   const ctx = canvas.getContext('2d');
-  const duration = video.duration;
+  const duration = vidElement.duration;
+  let firstFired = false;
 
   for (let i = 0; i < FRAME_COUNT; i++) {
     let time = (i / (FRAME_COUNT - 1)) * duration;
@@ -69,88 +81,133 @@ async function extractAllFrames() {
       const finish = () => {
         if (done) return;
         done = true;
-        video.removeEventListener('seeked', onSeeked);
+        vidElement.removeEventListener('seeked', onSeeked);
         clearTimeout(tid);
         resolve();
       };
       const onSeeked = () => finish();
       const tid = setTimeout(finish, 2000); // safety net
-      video.addEventListener('seeked', onSeeked);
-      video.currentTime = time;
+      vidElement.addEventListener('seeked', onSeeked);
+      vidElement.currentTime = time;
     });
 
-    ctx.drawImage(video, 0, 0, OUTPUT_WIDTH, OUTPUT_HEIGHT);
-    blobUrls.push(await captureFrame(canvas));
-    setLoadingProgress((i + 1) / FRAME_COUNT);
+    ctx.drawImage(vidElement, 0, 0, OUTPUT_WIDTH, OUTPUT_HEIGHT);
+    urlsArray.push(await captureFrame(canvas));
+    
+    if (onProgress) onProgress((i + 1) / FRAME_COUNT);
 
-    // Show the page immediately after the first frame is ready
-    if (!earlyInit && blobUrls.length >= SHOW_AFTER) {
-      earlyInit = true;
-      init();
+    if (!firstFired && urlsArray.length >= SHOW_AFTER) {
+      firstFired = true;
+      if (onFirstFrame) onFirstFrame();
     }
   }
 }
 
-function getScrollProgress() {
-  const rect = spacer.getBoundingClientRect();
+function getScrollProgress(spacerEl) {
+  if (!spacerEl) return 0;
+  const rect = spacerEl.getBoundingClientRect();
   const scrollable = rect.height - window.innerHeight;
   return Math.min(Math.max(-rect.top / scrollable, 0), 1);
 }
 
-function updateFrame() {
-  if (!scrollReady) return;
-  const p = getScrollProgress();
-  document.documentElement.style.setProperty('--hero-progress', p.toFixed(3));
-  const idx = Math.round(p * (blobUrls.length - 1));
-  if (heroImg.src !== blobUrls[idx]) heroImg.src = blobUrls[idx];
+function updateFrames() {
+  // Update Hero
+  if (scrollReadyHero && blobUrlsHero.length > 0) {
+    const p = getScrollProgress(spacerHero);
+    document.documentElement.style.setProperty('--hero-progress', p.toFixed(3));
+    const idx = Math.round(p * (blobUrlsHero.length - 1));
+    if (heroImg.src !== blobUrlsHero[idx]) heroImg.src = blobUrlsHero[idx];
+  }
+  
+  // Update Process
+  if (scrollReadyProcess && blobUrlsProcess.length > 0) {
+    const p = getScrollProgress(spacerProcess);
+    const idx = Math.round(p * (blobUrlsProcess.length - 1));
+    if (processImg.src !== blobUrlsProcess[idx]) processImg.src = blobUrlsProcess[idx];
+    // Zoom effect: scale from 1.0 to 1.25 as user scrolls
+    processImg.style.transform = `scale(${1 + (p * 0.25)})`;
+  }
 }
 
-function init() {
-  if (scrollReady) return; // prevent double-init
-  heroImg.src = blobUrls[0];
-  scrollReady  = true;
-  window.addEventListener('scroll', updateFrame, { passive: true });
-  window.addEventListener('resize', updateFrame);
-  updateFrame();
+function initHero() {
+  if (scrollReadyHero) return;
+  if(blobUrlsHero.length > 0) heroImg.src = blobUrlsHero[0];
+  scrollReadyHero = true;
+  window.addEventListener('scroll', updateFrames, { passive: true });
+  window.addEventListener('resize', updateFrames);
+  updateFrames();
   overlay.classList.add('hidden');
   document.body.classList.add('page-ready');
 }
 
-async function handleVideoReady() {
-  console.log('[LC] Video ready. Duration:', video.duration);
+function initProcess() {
+  if (scrollReadyProcess) return;
+  if(blobUrlsProcess.length > 0) processImg.src = blobUrlsProcess[0];
+  scrollReadyProcess = true;
+  updateFrames();
+}
+
+async function handleHeroVideoReady() {
+  console.log('[LC] Hero Video ready. Duration:', videoHero.duration);
   try {
-    await extractAllFrames();
-    console.log('[LC] All frames extracted:', blobUrls.length);
-    if (!earlyInit) init(); // final init if early one didn't fire
+    await extractVideoFrames(
+      videoHero, 
+      blobUrlsHero, 
+      setLoadingProgress, 
+      () => {
+        if (!earlyInitHero) {
+          earlyInitHero = true;
+          initHero();
+        }
+      }
+    );
+    console.log('[LC] Hero frames extracted:', blobUrlsHero.length);
+    if (!earlyInitHero) initHero();
+    
+    // Start processing second video in background
+    if(videoProcess && videoProcess.readyState >= 1) {
+      handleProcessVideoReady();
+    } else if(videoProcess) {
+      videoProcess.addEventListener('loadedmetadata', handleProcessVideoReady, { once: true });
+    }
   } catch (err) {
-    console.error('[LC] Frame extraction failed:', err);
-    // Still show page on error — use video poster/fallback
-    if (!earlyInit && blobUrls.length > 0) init();
-    overlay.querySelector('.loading-sub').textContent =
-      err.message?.includes('tainted') 
-        ? 'Canvas tainted — check CORS on video.' 
-        : 'Serve over http(s) — not file://. Then reload.';
+    console.error('[LC] Hero extraction failed:', err);
+    if (!earlyInitHero && blobUrlsHero.length > 0) initHero();
+    overlay.querySelector('.loading-sub').textContent = 'Error loading hero video frames.';
   }
 }
 
-video.addEventListener('loadedmetadata', handleVideoReady, { once: true });
-
-if (video.readyState >= 1) {
-  handleVideoReady();
+async function handleProcessVideoReady() {
+  console.log('[LC] Process Video ready. Duration:', videoProcess.duration);
+  try {
+    await extractVideoFrames(videoProcess, blobUrlsProcess, null, initProcess);
+    console.log('[LC] Process frames extracted:', blobUrlsProcess.length);
+    initProcess();
+  } catch (err) {
+    console.error('[LC] Process extraction failed:', err);
+    if(blobUrlsProcess.length > 0) initProcess();
+  }
 }
 
-video.addEventListener('error', () => {
-  console.error('[LC] Video failed to load.');
-  overlay.querySelector('.loading-sub').textContent =
-    'Video failed to load. Check assets/hero.mp4.';
-});
+if(videoHero) {
+  videoHero.addEventListener('loadedmetadata', handleHeroVideoReady, { once: true });
+  if (videoHero.readyState >= 1) handleHeroVideoReady();
+}
 
-setTimeout(() => {
-  if (video.readyState === 0) {
+if(videoHero) {
+  videoHero.addEventListener('error', () => {
+    console.error('[LC] Video failed to load.');
     overlay.querySelector('.loading-sub').textContent =
-      'Video not loading — serve via a local server, not file://';
-  }
-}, 5000);
+      'Video failed to load. Check assets/hero.mp4.';
+  });
+  
+  setTimeout(() => {
+    if (videoHero.readyState === 0) {
+      overlay.querySelector('.loading-sub').textContent =
+        'Video not loading — serve via a local server, not file://';
+    }
+  }, 5000);
+}
 
 // Auto-dismiss loading overlay after 15s as a last-resort fallback
 setTimeout(() => {
@@ -563,5 +620,36 @@ if (statNumbers.length > 0) {
 
   statNumbers.forEach(stat => {
     statObserver.observe(stat);
+  });
+}
+
+/* ============================================================
+   FOOTER YEAR
+   ============================================================ */
+const footerYear = document.getElementById('footer-year');
+if (footerYear) footerYear.textContent = String(new Date().getFullYear());
+
+/* ============================================================
+   MAGNETIC BUTTONS — subtle cursor-follow micro-interaction
+   ============================================================ */
+if (!prefersReducedMotion && window.matchMedia('(pointer: fine)').matches) {
+  document.querySelectorAll('[data-magnetic]').forEach((btn) => {
+    let raf = null;
+    const strength = 0.35;
+
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = (e.clientX - rect.left - rect.width / 2) * strength;
+      const y = (e.clientY - rect.top - rect.height / 2) * strength;
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        btn.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+      });
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      if (raf) cancelAnimationFrame(raf);
+      btn.style.transform = '';
+    });
   });
 }

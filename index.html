@@ -35,7 +35,8 @@
   </div>
 
   <!-- Hidden video source (frame extraction only) -->
-  <video id="source-video" src="assets/hero.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
+  <video id="source-video" src="assets/hero.mp4" playsinline muted preload="auto" loop></video>
+  <video id="process-video" src="assets/before_after_section.mp4" playsinline muted preload="auto" loop></video>
 
   <!-- ================= NAV ================= -->
   <header class="site-header" id="site-header" role="banner">
@@ -51,7 +52,7 @@
       <a href="https://www.linearconcepts.in/services.html" id="nav-services">Services</a>
     </nav>
 
-    <a href="https://www.linearconcepts.in/contact-us.html" class="btn-nav" id="nav-cta">
+    <a href="https://www.linearconcepts.in/contact-us.html" class="btn-nav" id="nav-cta" data-magnetic>
       Contact Us <span class="arrow">↗</span>
     </a>
 
@@ -277,57 +278,62 @@
   <!-- ================= SERVICES ================= -->
   <section class="services-section new-services-section" id="services">
     <div class="top-head" data-reveal>
-      <span class="tag">○ service</span>
-
+      <span class="tag">○ Our Services</span>
       <div class="heading-wrap">
-        <h2>Designing spaces<br>that define the future.</h2>
-        <p>
-          We design spaces that balance form, function,
-          and timeless architectural innovation.
-        </p>
+        <h2>Integrated Architectural<br>Solutions for Modern Living</h2>
       </div>
     </div>
 
     <div class="service-list">
 
       <!-- 01 -->
-      <div class="service-item" data-reveal>
-        <div class="service-image">
-          <img src="https://www.linearconcepts.in/images/projects/details/micasa/micasa-06.jpg" alt="Architecture Design">
+      <div class="service-item" id="service-card-1">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M5 21V7l8-4v18M13 3l8 4v14M9 9v12M17 11v10" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div class="service-content">
-          <h3>01 — Architecture Design</h3>
-          <p>Project Management, Master Planning, Urban Design and Comprehensive Architectural Design.</p>
-          <a href="#">View Details</a>
+          <h3>Build & Site Execution</h3>
+          <p>We oversee construction with careful coordination, ensuring each stage runs efficiently and meets the highest standards on-site.</p>
         </div>
       </div>
 
       <!-- 02 -->
-      <div class="service-item reverse" data-reveal>
-        <div class="service-image">
-          <img src="https://www.linearconcepts.in/images/projects/details/satyasheel/satyasheel-15.jpg" alt="Interior Design">
+      <div class="service-item" id="service-card-2">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19h16v-6H4v6zM4 13l8-6 8 6M10 19v-4h4v4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div class="service-content">
-          <h3>02 — Interior Design</h3>
-          <p>Interior Design, Bespoke Furniture and Overseas Procurement for premium spaces.</p>
-          <a href="#">View Details</a>
+          <h3>Design Development & Planning</h3>
+          <p>We transform ideas into well-defined designs, combining creative thinking with practical planning for functional and refined outcomes.</p>
         </div>
       </div>
 
       <!-- 03 -->
-      <div class="service-item" data-reveal>
-        <div class="service-image">
-          <img src="https://www.linearconcepts.in/images/projects/details/facades/facades-01.jpg" alt="Visualization & Sustainability">
+      <div class="service-item" id="service-card-3">
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12h4l3-9 5 18 3-9h5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
         <div class="service-content">
-          <h3>03 — Visualization & Sustainability</h3>
-          <p>3D Visualization and Green Building Consultancy to bring future-ready ideas alive.</p>
-          <a href="#">View Details</a>
+          <h3>Interior & Bespoke Furnishing</h3>
+          <p>We curate interior spaces with bespoke furniture and curated materials, crafting environments of timeless beauty.</p>
         </div>
       </div>
 
     </div>
   </section>
+
+  <!-- ================= PROCESS — scroll-scrubbed before/after ================= -->
+  <div class="scroll-spacer" id="process-spacer">
+    <div class="video-pinned" role="img" aria-label="Process from structure to actual building">
+      <img id="process-frame" alt="Process sequence">
+      <div class="process-overlay">
+        <h2>From Structure<br>to Reality.</h2>
+        <div class="process-indicator">
+          <div class="scroll-hint-icon process-hint" aria-hidden="true">↓</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= GALLERY ================= -->
   <section class="gallery-section" id="gallery" aria-labelledby="gallery-heading">
@@ -467,77 +473,88 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-
-    <div class="footer-top">
-      <div class="footer-cta">
-        <h2>Let’s Create Your Dream Space</h2>
-        <p>Transforming ideas into timeless architecture, interiors, and urban spaces.</p>
-        <a href="#" class="footer-btn">Contact Us</a>
-      </div>
+  <!-- ================= CTA BAND ================= -->
+  <section class="cta-band" aria-labelledby="cta-heading">
+    <div class="cta-band-media">
+      <img src="assets/footer_images.png" class="cta-band-img" alt="" loading="lazy" decoding="async">
+      <div class="cta-band-scrim" aria-hidden="true"></div>
     </div>
-
-    <div class="footer-image-container">
-      <img src="assets/footer_images.png" class="footer-hero-image" alt="Linear Concepts">
+    <div class="cta-band-content" data-reveal="zoom">
+      <span class="cta-eyebrow"><span class="cta-eyebrow-dot" aria-hidden="true"></span>Start your journey</span>
+      <h2 id="cta-heading">Let’s Create Your<br>Dream Space</h2>
+      <p>Transforming ideas into timeless architecture, interiors, and urban spaces.</p>
+      <a href="https://www.linearconcepts.in/contact-us.html" class="footer-btn" data-magnetic>
+        <span class="footer-btn-shine" aria-hidden="true"></span>
+        <span class="footer-btn-label">Get In Touch</span>
+        <span class="arrow">→</span>
+      </a>
     </div>
+  </section>
 
-    <div class="footer-grid">
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer" id="footer">
+    <div class="footer-glow" aria-hidden="true"></div>
 
-      <div class="footer-col">
-        <p>
-          Linear Concepts is an Architectural, Interior and Urban-Designing firm with a reputation for challenging convention and pursuing design excellence.
-        </p>
+    <div class="footer-inner">
+      <div class="footer-top-row">
 
-        <div class="socials">
-          <a href="#">Facebook</a>
-          <a href="#">Instagram</a>
-          <a href="#">LinkedIn</a>
-          <a href="#">Twitter</a>
+        <div class="footer-brand-col" data-reveal data-stagger="0">
+          <a href="https://www.linearconcepts.in/" class="footer-logo" aria-label="Linear Concepts – Home">
+            <span class="footer-logo-mark" aria-hidden="true">L</span>
+            <span class="footer-logo-text">LINEAR<span>CONCEPTS</span></span>
+          </a>
+          <p class="footer-blurb">An Architectural, Interior and Urban-Design studio with a reputation for challenging convention and pursuing design excellence since 1988.</p>
+          <div class="footer-socials">
+            <a href="#" aria-label="Facebook">Facebook</a>
+            <a href="#" aria-label="Instagram">Instagram</a>
+            <a href="#" aria-label="LinkedIn">LinkedIn</a>
+            <a href="#" aria-label="Twitter">Twitter</a>
+          </div>
         </div>
+
+        <div class="footer-nav-col" data-reveal data-stagger="1">
+          <h4 class="footer-heading">Explore</h4>
+          <nav class="footer-nav" aria-label="Footer navigation">
+            <a href="https://www.linearconcepts.in/"><span>Home</span></a>
+            <a href="https://www.linearconcepts.in/about-us.html"><span>About Us</span></a>
+            <a href="https://www.linearconcepts.in/projects.html"><span>Projects</span></a>
+            <a href="https://www.linearconcepts.in/services.html"><span>Services</span></a>
+            <a href="https://www.linearconcepts.in/contact-us.html"><span>Contact Us</span></a>
+          </nav>
+        </div>
+
+        <div class="footer-studio-col" data-reveal data-stagger="2">
+          <h4 class="footer-heading">Studios</h4>
+          <div class="footer-address">
+            <strong>Gurugram</strong>
+            <p>Office No. 204, Bestech Chambers, Sushant Lok-1, B&nbsp;Block, Gurugram, Haryana – 122002</p>
+          </div>
+          <div class="footer-address">
+            <strong>Delhi</strong>
+            <p>407 A09 GD ITL North-Ex Towers, Netaji Subhash Place, New Delhi – 110034</p>
+          </div>
+        </div>
+
+        <div class="footer-contact-col" data-reveal data-stagger="3">
+          <h4 class="footer-heading">Get in Touch</h4>
+          <a href="tel:+919811205110" class="footer-big-link">+91 98112 05110</a>
+          <a href="mailto:studio@linearconcepts.in" class="footer-big-link">studio@linearconcepts.in</a>
+          <div class="footer-mini-links">
+            <a href="mailto:shaleenjethi@linearconcepts.in">Shaleen Jethi <span class="arrow">↗</span></a>
+            <a href="mailto:careers@linearconcepts.in">Careers <span class="arrow">↗</span></a>
+          </div>
+        </div>
+
       </div>
 
-      <div class="footer-col footer-links">
-        <h4>Quick Links</h4>
-        <a href="#">Home</a>
-        <a href="#">About Us</a>
-        <a href="#">Projects</a>
-        <a href="#">Services</a>
-        <a href="#">Our Team</a>
-        <a href="#">Contact Us</a>
+      <div class="footer-bottom-row">
+        <span>© <span id="footer-year">2026</span> Linear Concepts. All rights reserved.</span>
+        <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+          <span class="back-to-top-icon" aria-hidden="true">↑</span> Back to top
+        </button>
+        <span>Site by Dreweb</span>
       </div>
-
-      <div class="footer-col">
-        <h4>Contact Us</h4>
-
-        <p><strong>Gurugram Studio:</strong><br>
-        Office No. 204, Bestech Chambers, Sushant Lok-1, B Block Gurugram, Haryana - 122002</p>
-
-        <br>
-
-        <p><strong>Delhi Studio:</strong><br>
-        407 A09 GD ITL North-Ex Towers, Netaji Subhash Place, New Delhi - 110034</p>
-
-        <br>
-
-        <p><strong>Call:</strong><br>
-        +91 9811205110</p>
-
-        <br>
-
-        <p><strong>Email:</strong><br>
-        studio@linearconcepts.in<br>
-        shaleenjethi@linearconcepts.in<br>
-        careers@linearconcepts.in</p>
-      </div>
-
     </div>
-
-    <div class="custom-footer-bottom">
-      <span>© Linear Concepts. All Rights Reserved.</span>
-      <span>Site by Dreweb</span>
-    </div>
-
   </footer>
 
   <script src="script.js"></script>
