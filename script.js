@@ -28,22 +28,84 @@ const FRAME_COUNT   = 60;       // 60 = good balance of smooth + fast
 const OUTPUT_WIDTH  = 1280;
 const OUTPUT_HEIGHT = 720;
 const WEBP_QUALITY  = 0.80;
-const SHOW_AFTER    = 1;        // show page after extracting this many frames
+const FRAME_COUNT   = 60;
+const OUTPUT_WIDTH  = 1280;
+const OUTPUT_HEIGHT = 720;
+const SHOW_AFTER    = 1;
 
 // ---- ELEMENTS ----
 const videoHero    = document.getElementById('source-video');
+const videoProcess = document.getElementById('process-video');
+
+const heroImg      = document.getElementById('hero-frame');
 const spacerHero   = document.getElementById('spacer');
 
-const videoProcess = document.getElementById('process-frame');
+const processImg   = document.getElementById('process-frame');
 const spacerProcess= document.getElementById('process-spacer');
 
 const overlay      = document.getElementById('loading-overlay');
 const header       = document.getElementById('site-header');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Remove loading screen immediately since we don't need to extract frames anymore
+// Allow cross-origin video (required for canvas.toBlob)
+if(videoHero) videoHero.crossOrigin = 'anonymous';
+if(videoProcess) videoProcess.crossOrigin = 'anonymous';
+
+let blobUrlsHero    = [];
+let blobUrlsProcess = [];
+
+let scrollReadyHero    = false;
+let scrollReadyProcess = false;
+let earlyInitHero      = false;
+
+// Remove loading screen immediately to avoid blocking the user
 overlay.classList.add('hidden');
 document.body.classList.add('page-ready');
+
+function captureFrame(canvas) {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      resolve(URL.createObjectURL(blob));
+    }, 'image/webp', WEBP_QUALITY);
+  });
+}
+
+async function extractVideoFrames(vidElement, urlsArray, onFirstFrame) {
+  const canvas = document.createElement('canvas');
+  canvas.width  = OUTPUT_WIDTH;
+  canvas.height = OUTPUT_HEIGHT;
+  const ctx = canvas.getContext('2d');
+  const duration = vidElement.duration;
+  let firstFired = false;
+
+  for (let i = 0; i < FRAME_COUNT; i++) {
+    let time = (i / (FRAME_COUNT - 1)) * duration;
+    if (i === 0) time = 0.001;
+
+    await new Promise((resolve) => {
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        vidElement.removeEventListener('seeked', onSeeked);
+        clearTimeout(tid);
+        resolve();
+      };
+      const onSeeked = () => finish();
+      const tid = setTimeout(finish, 2000);
+      vidElement.addEventListener('seeked', onSeeked);
+      vidElement.currentTime = time;
+    });
+
+    ctx.drawImage(vidElement, 0, 0, OUTPUT_WIDTH, OUTPUT_HEIGHT);
+    urlsArray.push(await captureFrame(canvas));
+    
+    if (!firstFired && urlsArray.length >= SHOW_AFTER) {
+      firstFired = true;
+      if (onFirstFrame) onFirstFrame();
+    }
+  }
+}
 
 function getScrollProgress(spacerEl) {
   if (!spacerEl) return 0;
@@ -53,70 +115,76 @@ function getScrollProgress(spacerEl) {
 }
 
 function updateFrames() {
-  if (videoHero && videoHero.readyState >= 1) {
+  if (scrollReadyHero && blobUrlsHero.length > 0) {
     const p = getScrollProgress(spacerHero);
     document.documentElement.style.setProperty('--hero-progress', p.toFixed(3));
-    // Check if duration is a valid number
-    if (!isNaN(videoHero.duration) && isFinite(videoHero.duration)) {
-       videoHero.currentTime = p * videoHero.duration;
-    }
+    const idx = Math.round(p * (blobUrlsHero.length - 1));
+    if (heroImg.src !== blobUrlsHero[idx]) heroImg.src = blobUrlsHero[idx];
   }
   
-  if (videoProcess && videoProcess.readyState >= 1) {
+  if (scrollReadyProcess && blobUrlsProcess.length > 0) {
     const p = getScrollProgress(spacerProcess);
-    if (!isNaN(videoProcess.duration) && isFinite(videoProcess.duration)) {
-       videoProcess.currentTime = p * videoProcess.duration;
-    }
+    const idx = Math.round(p * (blobUrlsProcess.length - 1));
+    if (processImg.src !== blobUrlsProcess[idx]) processImg.src = blobUrlsProcess[idx];
+    processImg.style.transform = 'scale(1)'; // Removed zoom effect
   }
 }
 
-// Bind native scroll and lenis scroll events
+function initHero() {
+  if (scrollReadyHero) return;
+  if(blobUrlsHero.length > 0) heroImg.src = blobUrlsHero[0];
+  scrollReadyHero = true;
+  updateFrames();
+}
+
+function initProcess() {
+  if (scrollReadyProcess) return;
+  if(blobUrlsProcess.length > 0) processImg.src = blobUrlsProcess[0];
+  scrollReadyProcess = true;
+  updateFrames();
+}
+
+async function handleHeroVideoReady() {
+  try {
+    await extractVideoFrames(videoHero, blobUrlsHero, () => {
+      if (!earlyInitHero) {
+        earlyInitHero = true;
+        initHero();
+      }
+    });
+    if (!earlyInitHero) initHero();
+    
+    if(videoProcess && videoProcess.readyState >= 1) {
+      handleProcessVideoReady();
+    } else if(videoProcess) {
+      videoProcess.addEventListener('loadedmetadata', handleProcessVideoReady, { once: true });
+    }
+  } catch (err) {
+    console.error('Hero extraction failed:', err);
+  }
+}
+
+async function handleProcessVideoReady() {
+  try {
+    await extractVideoFrames(videoProcess, blobUrlsProcess, initProcess);
+    initProcess();
+  } catch (err) {
+    console.error('Process extraction failed:', err);
+  }
+}
+
 window.addEventListener('scroll', updateFrames, { passive: true });
 window.addEventListener('resize', updateFrames);
 
-// Trigger initial update when metadata loads
-if (videoHero) {
-  videoHero.addEventListener('loadedmetadata', updateFrames);
-}
-if (videoProcess) {
-  videoProcess.addEventListener('loadedmetadata', updateFrames);
-}
-// Also trigger one immediately just in case it's already cached
-updateFrames();
-
 if(videoHero) {
-  videoHero.addEventListener('error', () => {
-    console.error('[LC] Video failed to load.');
-    overlay.querySelector('.loading-sub').textContent =
-      'Video failed to load. Check assets/hero.mp4.';
-  });
-  
-  setTimeout(() => {
-    if (videoHero.readyState === 0) {
-      overlay.querySelector('.loading-sub').textContent =
-        'Video not loading — serve via a local server, not file://';
-    }
-  }, 5000);
-}
-
-// Auto-dismiss loading overlay after 15s as a last-resort fallback
-setTimeout(() => {
-  if (!overlay.classList.contains('hidden')) {
-    overlay.classList.add('hidden');
-    document.body.classList.add('page-ready');
-    console.warn('[LC] Loading overlay force-dismissed after 15s');
+  if (videoHero.readyState >= 1) {
+    handleHeroVideoReady();
+  } else {
+    videoHero.addEventListener('loadedmetadata', handleHeroVideoReady, { once: true });
   }
-}, 15000);
-
-// Skip button — dismiss overlay immediately
-const skipBtn = document.getElementById('loading-skip');
-if (skipBtn) {
-  skipBtn.addEventListener('click', () => {
-    overlay.classList.add('hidden');
-    document.body.classList.add('page-ready');
-    if (!scrollReady && blobUrls.length > 0) init();
-  });
 }
+
+// Removed broken skip logic
 
 /* ============================================================
    SITE-WIDE MOTION — Framer-style choreography without a framework
